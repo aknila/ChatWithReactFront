@@ -36,7 +36,7 @@ export class App extends React.Component<any, any> {
 			},
 			lastEvent: '',
 			author: '',
-			endpoint: 'http://127.0.0.1:4001',
+			endpoint: 'http://212.47.251.157:4001',
 			response: false,
 			socket: null,
 			count: 1,
