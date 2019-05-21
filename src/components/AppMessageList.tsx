@@ -1,13 +1,11 @@
 import React from 'react';
-import { Stack } from 'office-ui-fabric-react';
+import { Stack, Image, IImageProps, ImageFit } from 'office-ui-fabric-react';
 import { AppMessageItem } from './AppMessageItem';
 import { AppContext } from '../AppContext';
 
 const spacing = {
 	childrenGap: 10
 }
-
-// let messagesEnd: HTMLDivElement | null;
 
 export class AppMessageList extends React.Component<any, any> {
 
@@ -23,11 +21,27 @@ export class AppMessageList extends React.Component<any, any> {
 		const { list } = this.context;
 
 		const listId = Object.keys(list);
+		const imageProps: IImageProps = {
+			imageFit: ImageFit.contain,
+			width: 50,
+			height: 50,
+			className: 'pdpImage'
+		};
 		return (
-			<Stack padding={10} className="container" tokens={spacing}>
-				{listId.map(id => (
-					<AppMessageItem key={id} id={id} {...list[id]}/>
-				))}
+			<Stack className="container" tokens={spacing}>
+				{listId.map(id => {
+					return (
+						<Stack key={id} horizontal tokens={{childrenGap: 5}} className="subContainer">
+							<Image
+								{...imageProps as any}
+								src={ list[id].pdp ? list[id].pdp : 'https://www.freeiconspng.com/uploads/discord-metro-style-icon-0.png' }
+								alt="Profil Photo"
+							/>
+							<AppMessageItem id={id} {...list[id]}/>
+						</Stack>
+					);
+				}
+				)}
 				<div style={{ float:"left", clear: "both" }}
              		ref={this.myRef}>
         		</div>
@@ -35,6 +49,7 @@ export class AppMessageList extends React.Component<any, any> {
 		)
 	}
 
+	// Permet de descendre tout en bas de la liste de message quand un nouveau message arrive
 	scrollToBottom = () => {
 		if (this.myRef && this.myRef.current && this._isMounted) {
 			this.myRef.current.scrollIntoView({ behavior: "smooth"});
@@ -45,9 +60,12 @@ export class AppMessageList extends React.Component<any, any> {
 		this._isMounted = true;
 		this.scrollToBottom();
 	}
-	
+
+	// Scroll uniquement si il y a un nouveau message
 	componentDidUpdate() {
-		this.scrollToBottom();
+		if (this.props.lastEvent === 'new' && this._isMounted) {
+			this.scrollToBottom();
+		}
 	}
 
 	componentWillUnmount() {
