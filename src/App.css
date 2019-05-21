@@ -6,29 +6,95 @@
 }
 
 .container {
-	width: 300px;
-	min-width: 300px;
-	max-width: 300px;
 	height: 500px;
 	min-height: 500px;
 	max-height: 500px;
 	overflow: auto;
 }
 
+.subContainer {
+	width: 370px;
+	min-width: 370px;
+	max-width: 370px;
+}
+
 .containerItem {
-	max-width: 250px;
+	max-width: 245px;
 	word-wrap: break-word;
 	border: 1px solid black;
 	border-radius: 5px;
 	background-color: #aaaaaa;
-	color: black;	
+	color: black;
 }
 
 .containerItemAuthor {
-	max-width: 250px;
+	max-width: 245px;
 	word-wrap: break-word;
 	border: 1px solid black;
 	border-radius: 5px;
 	background-color: rgb(0, 120, 212);
 	color: white;
+}
+
+.textInput {
+	width: 200px;
+}
+
+.pdpImage {
+	border-radius: 25%;
+}
+
+.headerApp {
+	position: fixed;
+	top: 0;
+	left: 0;
+}
+
+.inputEditContainer {
+	text-decoration: none;
+	border: none;
+	background-color: rgb(0, 120, 212);
+	color: white;
+}
+
+.inputEdit {
+	text-decoration: none;
+	border: none;
+	background-color: rgb(0, 120, 212);
+	color: white;
+}
+
+.streamModal {
+	width: 350px;
+	height: 350px;
+}
+
+.acceptButton {
+	background-color: #107c10 !important;
+	color: white !important;
+	margin: 5px;
+}
+
+.acceptButton:hover {
+	background-color: #0c5a0c !important;
+	color: white !important;
+	margin: 5px;
+}
+
+.declineButton {
+	background-color: #e81123 !important;
+	color: white !important;
+	margin: 5px;
+}
+
+.declineButton:hover{
+	background-color: #a60c19 !important;
+	color: white !important;
+	margin: 5px;
+}
+
+.titleText {
+	font-weight: bold !important;
+	color: black !important;
+	font-size: 16px !important;
 }
