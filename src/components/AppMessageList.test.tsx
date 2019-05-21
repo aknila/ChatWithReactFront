@@ -15,8 +15,10 @@ class AppTest extends React.Component<any, any> {
 				list: list,
 				count: 0,
 				id: 'authorID',
+				pdp: '',
 				sendMessage: (author: string, text: string, id: string) => {},
-				changeName: (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string | undefined) => {}
+				changeName: (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string | undefined) => {},
+				changeUrl: (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string | undefined) => {}
 			}}>
 				<AppMessageList />
 			</AppContext.Provider>
