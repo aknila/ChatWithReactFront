@@ -4,7 +4,9 @@ export interface Message {
 	aid: string;
 	pdp: string | null;
 	date: string | null;
-	uid: string | null;
+	uid: string;
+	type: string;
+	link: string | null;
 }
   
 export interface MessagesList {
