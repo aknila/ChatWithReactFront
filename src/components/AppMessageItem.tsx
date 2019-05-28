@@ -1,5 +1,5 @@
 import React from 'react';
-import { Label, Stack, Text, IconButton, TextField } from 'office-ui-fabric-react';
+import { Label, Stack, Text, IconButton, TextField, Image, IImageProps, ImageFit, Link } from 'office-ui-fabric-react';
 import { AppContext } from '../AppContext';
 
 export class AppMessageItem extends React.Component<any, any> {
@@ -32,7 +32,7 @@ export class AppMessageItem extends React.Component<any, any> {
 				edit: false,
 				tmp: null,
 				newText: null
-			})	
+			})
 		}
 	}
 	
@@ -57,7 +57,7 @@ export class AppMessageItem extends React.Component<any, any> {
 	};
 
 	render() {
-		const { author, text, id, aid, date, uid } = this.props;
+		const { author, text, id, aid, date, uid, type, link } = this.props;
 		const style = {
 			root: {
 				fontSize: '10px',
@@ -67,8 +67,43 @@ export class AppMessageItem extends React.Component<any, any> {
 		}
 		let button;
 
+		const imageProps: IImageProps = {
+			imageFit: ImageFit.contain,
+			width: 100,
+			height: 100
+		};
+
+		// eslint-disable-next-line
+		let mtch = text.match(/(^data:image\/([a-zA-Z]*);base64,([^\"]*))|(\.(gif|jpe?g|tiff|png)$)/i);
+		let textRender;
+		// Selon si on est en edit ou non, rend un component input ou text
+		if (type === 'message') {
+			if (this.state.edit) {
+				textRender = <TextField className="inputEditContainer" inputClassName="inputEdit" borderless multiline={false} resizable={false} id={id} value={this.state.newText} onChange={this.onChange} onKeyUp={this.keyPress} />
+			} else if (mtch && mtch.length > 0) {
+				textRender = <Image
+					{...imageProps as any}
+					src={text}
+					alt="Photo in message"
+				/>
+			} else {
+				textRender = <Text id={id}>{text}</Text>
+			}
+		}
+		else {
+			if (mtch && mtch.length > 0) {
+				textRender = <Image
+					{...imageProps as any}
+					src={text}
+					alt={link}
+				/>
+			} else {
+				textRender = <Link className="fileLink" href={text}>{link}</Link>
+			}
+		}
+
 		// Permet de mettre en place les options si on est l auteur du message
-		if (aid === this.context.id) {
+		if (aid === this.context.id && type === 'message') {
 			button = <IconButton
 				data-automation-id="test"
 				text=""
@@ -92,20 +127,32 @@ export class AppMessageItem extends React.Component<any, any> {
 					]
 				}}
 		  />
+		} else if (aid === this.context.id) {
+			button = <IconButton
+				data-automation-id="test"
+				text=""
+				splitButtonAriaLabel={'See 1 sample options'}
+				aria-roledescription={'split button'}
+				style={{ height: '35px' }}
+				menuProps={{
+					items: [
+						{
+							key: 'deleteMessage',
+							text: 'Delete',
+							iconProps: { iconName: 'Delete' },
+							onClick: () => this.context.deleteMessage(uid)
+						}
+					]
+				}}
+		  />
 		}
-		let textInput;
-		// Selon si on est en edit ou non, rend un component input ou text
-		if (this.state.edit) {
-			textInput = <TextField className="inputEditContainer" inputClassName="inputEdit" borderless multiline={false} resizable={false} id={id} value={this.state.newText} onChange={this.onChange} onKeyUp={this.keyPress} />
-		} else {
-			textInput = <Text id={id}>{text}</Text>
-		}
+
 		return (
 			<div>
 				<Stack horizontal>
 					<Stack id="messageItem" className={aid === this.context.id ? "containerItemAuthor" : "containerItem"} padding={7}>
 						<Label styles={style} htmlFor={id}>{author}#{aid.substring(0, 4)} {date}</Label>
-						{textInput}
+						{textRender}
 					</Stack>
 					<div>
 						{button}

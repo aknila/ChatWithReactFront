@@ -6,42 +6,29 @@ import { AppMessageList } from './components/AppMessageList';
 import { AppContext } from './AppContext';
 import socketIOClient from "socket.io-client";
 import uuid from 'uuidv4';
+import { Link } from 'office-ui-fabric-react';
 import moment from 'moment';
 import { initializeIcons } from '@uifabric/icons';
+import { Message } from './App.types';
 initializeIcons();
 
-let index = 3;
+let index = 1;
 
 export class App extends React.Component<any, any> {
 	constructor(props: any) {
 		super(props);
 		this.state = {
-			list: {
-				'1': {
-					author: 'Anthony',
-					text: 'Hey',
-					aid: 'nope',
-					pdp: null,
-					date: null,
-					uid: null
-				},
-				'2': {
-					author: 'Jack',
-					text: 'Bonsoir',
-					aid: 'nope',
-					pdp: null,
-					date: null,
-					uid: null
-				}
-			},
+			list: {},
 			lastEvent: '',
-			author: '',
-			endpoint: 'http://212.47.251.157:4001',
-			response: false,
+			author: localStorage.getItem("contextAuthorKey"),
+			// endpoint: 'http://212.47.251.157:4001',
+			// endpoint: 'http://172.24.111.88:4001',
+			endpoint: 'http://127.0.0.1:4001',
 			socket: null,
 			count: 1,
-			id: uuid(),
-			pdp: ''
+			id: localStorage.getItem("contextIdKey"),
+			pdp: localStorage.getItem("contextPdpKey"),
+			urlParam: new URLSearchParams(window.location.search)
 		}
 	}
 
@@ -58,17 +45,42 @@ export class App extends React.Component<any, any> {
 	// Et bind les messages d'ecoute sur cette connexion
   	componentDidMount() {
 		this._isMounted = true;
+		console.log(window.location.pathname, this.state.id);
+		let stateId = (this.state.id ? this.state.id : uuid());
+		let stateAuthor = (this.state.author ? this.state.author : '');
+		let statePdp = (this.state.pdp ? this.state.pdp : '');
+
 		const { endpoint } = this.state;
-		const socket = socketIOClient(endpoint);
-		socket.on("chat message", (data: {author: string, text: string, id: string, pdp: string | null, uid: string}) : void => {this._newMessage(data.author, data.text, data.id, data.pdp, data.uid)});
+		const id = window.location.pathname.match(/^(\/salon1|\/salon2|\/salon3|\/salon4|\/salon5)$/g);
+		const socket = socketIOClient(endpoint + (id ? id[0] : '/salon1'));
+		socket.on('history', this._getHistory)
+		socket.on("chat message", (data: Message) : void => {this._newMessage(data)});
 		socket.on('new on', this.updateData);
 		socket.on('new off', this.updateData);
 		socket.on('delete message', this._deleteMessage);
 		socket.on('edit message', this._editMessage);
 		if (this._isMounted) {
 			this.setState({
-				socket: socket
+				socket: socket,
+				id: stateId,
+				pdp: statePdp,
+				author: stateAuthor
 			})
+		}
+	}
+
+	componentDidUpdate(prevProps: any, prevState: any) {
+		if (this.state.id !== prevState.id) {
+			console.log('change Id', prevState.id, this.state.id)
+			localStorage.setItem("contextIdKey", this.state.id)
+		}
+		if (this.state.author !== prevState.author) {
+			console.log('change Author', prevState.author, this.state.author)
+			localStorage.setItem("contextAuthorKey", this.state.author)
+		}
+		if (this.state.pdp !== prevState.pdp) {
+			console.log('change Pdp', prevState.pdp, this.state.pdp)
+			localStorage.setItem("contextPdpKey", this.state.pdp)
 		}
 	}
 
@@ -77,7 +89,14 @@ export class App extends React.Component<any, any> {
 	}
 
 	render () {
-		const { list, author, count, id, pdp } = this.state;
+		const { list, author, count, id, pdp, endpoint } = this.state;
+
+		const style = {
+			root: {
+				padding: 5
+			}
+		};
+
 		return (
 			<div className="App">
 				<AppContext.Provider value={{
@@ -90,14 +109,40 @@ export class App extends React.Component<any, any> {
 						changeName: this.changeName,
 						changeUrl: this.changeUrl,
 						editMessage: this._wEditMessage,
-						deleteMessage: this._wDeleteMessage
+						deleteMessage: this._wDeleteMessage,
+						endpoint: endpoint
 					}}>
 					<AppHeader />
+					<Link styles={style} onClick={this.loadMore}>Load more</Link>
 					<AppMessageList lastEvent={this.state.lastEvent}/>
 					<AppFooter />
 				</AppContext.Provider>
 			</div>
 		);
+	}
+
+	private loadMore = () => {
+		if (this._isMounted) {
+			let len = Object.keys(this.state.list).length + 5;
+			this.state.socket.emit('history', {len: len})
+		}
+	}
+
+	private _getHistory = (data: {save: Message[]}) => {
+		if (this._isMounted) {
+
+			// const { list } = this.state;
+			let newList = {};
+
+			data.save.forEach((elem) => {
+				let listId = index++;
+				newList = {...newList, [listId]: { author: elem.author, text: elem.text, aid: elem.aid, pdp: elem.pdp, date: elem.date, uid: elem.uid, type: elem.type, link: elem.link }}
+			})
+
+			this.setState({
+				list: newList
+			})
+		}
 	}
 
 	// Lance au serveur un event d edition de message
@@ -121,11 +166,13 @@ export class App extends React.Component<any, any> {
 			let copy = list;
 			const keys = Object.keys(list);
 			const newList = keys.filter(id => (list[id].uid === data.uid))
-			copy[newList[0]].text = data.text;
-			this.setState({
-				list: copy,
-				lastEvent: 'edit'
-			})
+			if (newList && newList.length > 0 && copy[newList[0]]) {
+				copy[newList[0]].text = data.text;
+				this.setState({
+					list: copy,
+					lastEvent: 'edit'
+				})
+			}
 		}
 	}
 
@@ -136,32 +183,36 @@ export class App extends React.Component<any, any> {
 			let copy = list;
 			const keys = Object.keys(list);
 			const newList = keys.filter(id => (list[id].uid === data.uid))
-			delete copy[newList[0]];
-			this.setState({
-				list: copy,
-				lastEvent: 'delete'
-			})
+			if (newList && newList.length > 0 && copy[newList[0]]) {
+				delete copy[newList[0]];
+				this.setState({
+					list: copy,
+					lastEvent: 'delete'
+				})
+			}
+			if (Object.keys(copy).length < 7) {
+				this.state.socket.emit('history', {len: 7})
+			}
 		}
 	}
 
 	// Lance au serveur un event de nouveau message
-	private _sendMessage = (author: string, text: string, id: string, pdp: string | null) => {
+	private _sendMessage = (author: string, text: string, aid: string, pdp: string | null, type: string, link: string | null) => {
 		if (this._isMounted) {
-			this.state.socket.emit('chat message', {author: author, text: text, id: id, pdp: pdp, uid: uuid()})
+			const now = moment().format("hh:mm A").toString();
+			this.state.socket.emit('chat message', {author: author, text: text, aid: aid, pdp: pdp, uid: uuid(), date: now, type: type, link: link})
 		}
 	}
 
 	// Reçois les infos depuis le serveur sur l arrivée d un nouveau message
-	private _newMessage = (author: string, text: string, id: string, pdp: string | null, uid: string) => {
+	private _newMessage = (data: Message) => {
 		if (this._isMounted) {
-		
+
 			const { list } = this.state;
 			const listId = index++;
 
-			const now = moment().format("hh:mm A").toString();
-	
 			this.setState({
-				list: {...list, [listId]: {author: author, text: text, aid: id, pdp: pdp, date: now, uid: uid}},
+				list: {...list, [listId]: {author: data.author, text: data.text, aid: data.aid, pdp: data.pdp, date: data.date, uid: data.uid, type: data.type, link: data.link}},
 				lastEvent: 'new'
 			})
 		}

@@ -27,24 +27,24 @@ export class AppMessageList extends React.Component<any, any> {
 			height: 50,
 			className: 'pdpImage'
 		};
+
 		return (
 			<Stack className="container" tokens={spacing}>
 				{listId.map(id => {
 					return (
 						<Stack key={id} horizontal tokens={{childrenGap: 5}} className="subContainer">
 							<Image
-								{...imageProps as any}
+								{...imageProps}
 								src={ list[id].pdp ? list[id].pdp : 'https://www.freeiconspng.com/uploads/discord-metro-style-icon-0.png' }
 								alt="Profil Photo"
 							/>
 							<AppMessageItem id={id} {...list[id]}/>
 						</Stack>
 					);
-				}
-				)}
+				})}
 				<div style={{ float:"left", clear: "both" }}
              		ref={this.myRef}>
-        		</div>
+    			</div>
 			</Stack>
 		)
 	}
