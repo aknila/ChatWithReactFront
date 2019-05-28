@@ -43,8 +43,6 @@ it('render AppHeader', () => {
 	};
 	const wrapper = Enzyme.mount(<AppTest fn={mockSendMessage}/>);
 
-    // console.log(toJson(wrapper.find('#sendButton')));
-
 	expect(wrapper.find('input#sendInput').prop('value')).toBe('');
     wrapper.find('input#sendInput').simulate('change', event);
     expect(wrapper.find('input#sendInput').prop('value')).toBe('the-value');
