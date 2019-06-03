@@ -22,9 +22,9 @@ export class App extends React.Component<any, any> {
 			list: {},
 			lastEvent: '',
 			author: localStorage.getItem("contextAuthorKey"),
-			// endpoint: 'http://212.47.251.157:4001',
+			endpoint: 'http://212.47.251.157:4001',
 			// endpoint: 'http://172.24.111.88:4001',
-			endpoint: 'http://127.0.0.1:4001',
+			// endpoint: 'http://127.0.0.1:4001',
 			socket: null,
 			count: 1,
 			id: localStorage.getItem("contextIdKey"),
@@ -70,15 +70,12 @@ export class App extends React.Component<any, any> {
 
 	componentDidUpdate(prevProps: any, prevState: any) {
 		if (this.state.id !== prevState.id) {
-			console.log('change Id', prevState.id, this.state.id)
 			localStorage.setItem("contextIdKey", this.state.id)
 		}
 		if (this.state.author !== prevState.author) {
-			console.log('change Author', prevState.author, this.state.author)
 			localStorage.setItem("contextAuthorKey", this.state.author)
 		}
 		if (this.state.pdp !== prevState.pdp) {
-			console.log('change Pdp', prevState.pdp, this.state.pdp)
 			localStorage.setItem("contextPdpKey", this.state.pdp)
 		}
 	}

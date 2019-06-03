@@ -37,9 +37,12 @@ class AppTest extends React.Component<any, any> {
 				count: 0,
 				id: 'authorID',
 				pdp: '',
+				endpoint: '',
 				sendMessage: (author: string, text: string, id: string) => {},
 				changeName: fakeOnChange,
-				changeUrl: fakeOnChange
+				changeUrl: fakeOnChange,
+				editMessage: (uid: string, text: string) => {},
+				deleteMessage: (uid: string) => {}
 			}}>
 				<AppHeader />
 			</AppContext.Provider>
@@ -57,7 +60,7 @@ it('render AppHeader', () => {
 	const wrapper = Enzyme.mount(<AppTest author={authorName} fn={mockOnChange}/>);
 
 	expect(wrapper.find('input')).toHaveLength(0);
-	wrapper.find('DefaultButton').simulate('click');
+	wrapper.find('DefaultButton[text="Profil Settings"]').simulate('click');
 	expect(wrapper.find('input')).toHaveLength(2);
 	wrapper.find('input#idName').simulate('change', event);
 	wrapper.find('input#idProfil').simulate('change', event);
