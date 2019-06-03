@@ -90,11 +90,11 @@ export class AppHeader extends React.Component<any, any> {
 				</Panel>
 				<Panel isOpen={this.state.showPanel.chan} isLightDismiss={true} headerText="Channel" onDismiss={this._hidePanel('chan')}>
 					<Stack horizontalAlign="center" padding={10} tokens={spacing}>
-						<Link className="channelBlock" href="/salon1">Salon 1</Link>
-						<Link className="channelBlock" href="/salon2">Salon 2</Link>
-						<Link className="channelBlock" href="/salon3">Salon 3</Link>
-						<Link className="channelBlock" href="/salon4">Salon 4</Link>
-						<Link className="channelBlock" href="/salon5">Salon 5</Link>
+						<Link className="channelBlock" href="/salon/1">Salon 1</Link>
+						<Link className="channelBlock" href="/salon/2">Salon 2</Link>
+						<Link className="channelBlock" href="/salon/3">Salon 3</Link>
+						<Link className="channelBlock" href="/salon/4">Salon 4</Link>
+						<Link className="channelBlock" href="/salon/5">Salon 5</Link>
 					</Stack>
 				</Panel>
 			</div>

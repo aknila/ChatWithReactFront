@@ -10,6 +10,7 @@ import { Link } from 'office-ui-fabric-react';
 import moment from 'moment';
 import { initializeIcons } from '@uifabric/icons';
 import { Message } from './App.types';
+// import Auth from './auth/Auth';
 initializeIcons();
 
 let index = 1;
@@ -27,9 +28,9 @@ export class App extends React.Component<any, any> {
 			socket: null,
 			count: 1,
 			id: localStorage.getItem("contextIdKey"),
-			pdp: localStorage.getItem("contextPdpKey"),
-			urlParam: new URLSearchParams(window.location.search)
+			pdp: localStorage.getItem("contextPdpKey")
 		}
+		// const auth: Auth = new Auth();
 	}
 
 	_isMounted = false;
@@ -45,14 +46,12 @@ export class App extends React.Component<any, any> {
 	// Et bind les messages d'ecoute sur cette connexion
   	componentDidMount() {
 		this._isMounted = true;
-		console.log(window.location.pathname, this.state.id);
 		let stateId = (this.state.id ? this.state.id : uuid());
 		let stateAuthor = (this.state.author ? this.state.author : '');
 		let statePdp = (this.state.pdp ? this.state.pdp : '');
-
 		const { endpoint } = this.state;
-		const id = window.location.pathname.match(/^(\/salon1|\/salon2|\/salon3|\/salon4|\/salon5)$/g);
-		const socket = socketIOClient(endpoint + (id ? id[0] : '/salon1'));
+		const id = this.props.salonId;
+		const socket = socketIOClient(endpoint + '/salon' + (id > 0 && id <= 5 ? id : '1'));
 		socket.on('history', this._getHistory)
 		socket.on("chat message", (data: Message) : void => {this._newMessage(data)});
 		socket.on('new on', this.updateData);
