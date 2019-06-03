@@ -8,6 +8,8 @@
 # testing
 /coverage
 
+/src/auth
+
 # production
 # /build
 
