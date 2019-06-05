@@ -22,9 +22,9 @@ export class App extends React.Component<any, any> {
 			list: {},
 			lastEvent: '',
 			author: localStorage.getItem("contextAuthorKey"),
-			endpoint: 'http://212.47.251.157:4001',
+			// endpoint: 'http://212.47.251.157:4001',
 			// endpoint: 'http://172.24.111.88:4001',
-			// endpoint: 'http://127.0.0.1:4001',
+			endpoint: 'http://127.0.0.1:4001',
 			socket: null,
 			count: 1,
 			id: localStorage.getItem("contextIdKey"),
@@ -50,7 +50,8 @@ export class App extends React.Component<any, any> {
 		let stateAuthor = (this.state.author ? this.state.author : '');
 		let statePdp = (this.state.pdp ? this.state.pdp : '');
 		const { endpoint } = this.state;
-		const id = this.props.salonId;
+		// const id = this.props.salonId;
+		const id = this.props.match.params.salonId;
 		const socket = socketIOClient(endpoint + '/salon' + (id > 0 && id <= 5 ? id : '1'));
 		socket.on('history', this._getHistory)
 		socket.on("chat message", (data: Message) : void => {this._newMessage(data)});
@@ -69,13 +70,13 @@ export class App extends React.Component<any, any> {
 	}
 
 	componentDidUpdate(prevProps: any, prevState: any) {
-		if (this.state.id !== prevState.id) {
+		if (localStorage.getItem('isLoggedIn') && this.state.id !== prevState.id) {
 			localStorage.setItem("contextIdKey", this.state.id)
 		}
-		if (this.state.author !== prevState.author) {
+		if (localStorage.getItem('isLoggedIn') && this.state.author !== prevState.author) {
 			localStorage.setItem("contextAuthorKey", this.state.author)
 		}
-		if (this.state.pdp !== prevState.pdp) {
+		if (localStorage.getItem('isLoggedIn') && this.state.pdp !== prevState.pdp) {
 			localStorage.setItem("contextPdpKey", this.state.pdp)
 		}
 	}
@@ -108,7 +109,7 @@ export class App extends React.Component<any, any> {
 						deleteMessage: this._wDeleteMessage,
 						endpoint: endpoint
 					}}>
-					<AppHeader />
+					<AppHeader logout={this.props.auth.logout}/>
 					<Link styles={style} onClick={this.loadMore}>Load more</Link>
 					<AppMessageList lastEvent={this.state.lastEvent}/>
 					<AppFooter />

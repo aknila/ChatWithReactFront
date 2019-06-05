@@ -42,6 +42,10 @@ export class AppHeader extends React.Component<any, any> {
 		}
 	};
 
+	private _logout = () => (): void => {
+		this.props.logout();
+	}
+
 	componentDidMount() {
 		this._isMounted = true;
 	}
@@ -74,6 +78,7 @@ export class AppHeader extends React.Component<any, any> {
 					<Stack horizontalAlign="center" horizontal tokens={spacing}>
 						<DefaultButton text="Channel List" onClick={this._showPanel('chan')} />
 						<DefaultButton text="Profil Settings" onClick={this._showPanel('panel')} />
+						<DefaultButton text="Logout" onClick={this._logout()} />
 					</Stack>
 				</Stack>
 				<Panel isOpen={this.state.showPanel.panel} isLightDismiss={true} headerText="Profil Settings" onDismiss={this._hidePanel('panel')}>
