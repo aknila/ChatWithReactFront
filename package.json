@@ -19,7 +19,7 @@
     "@types/uuid": "^3.4.4",
     "@types/uuidv4": "^2.0.0",
     "auth0-js": "^9.10.4",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "emoji-mart": "^2.11.1",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.13.0",
